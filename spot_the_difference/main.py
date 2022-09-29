@@ -79,6 +79,7 @@ if __name__=='__main__':
     
     difference = find_difference(img1,img2,True)
     cv2.imshow("Differences", difference)
+    cv2.imwrite("img/difference.png",difference)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
