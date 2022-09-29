@@ -1,3 +1,7 @@
+# @author: Manuel Alejandro Aponte
+# Program to find difference between two images
+
+
 import cv2
 import numpy as np
 
@@ -62,7 +66,7 @@ def find_difference(img1,img2,verbose=False):
         img_row_2 = np.concatenate((dilate, final_img), axis=1) 
         img_gallery = np.concatenate((img_row_1, img_row_2), axis=0)
         # concatenate image Vertically        
-        cv2.imshow("Differences", img_gallery)
+        cv2.imshow("Gallery", img_gallery)
         
     return final_img
         
@@ -70,10 +74,11 @@ def find_difference(img1,img2,verbose=False):
 if __name__=='__main__':
     
     # Load the two images
-    img1 = cv2.imread('city1.jpg')
-    img2 = cv2.imread("city2.jpg")
+    img1 = cv2.imread('img/city1.jpg')
+    img2 = cv2.imread("img/city2.jpg")
     
-    find_difference(img1,img2,True)
+    difference = find_difference(img1,img2,True)
+    cv2.imshow("Differences", difference)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
