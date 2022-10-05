@@ -67,11 +67,11 @@ def svd_compression(img,r=10):
    
     
 def img_approx_compressed(U, S, VT, k):
-    return np.clip((U[:,:k] @ np.diag(S[:k])) @ VT[:k],0,255).astype('uint8')
+    return np.clip((U[:,:k] @ np.diag(S[:k])) @ VT[:k],0,255).round().astype('uint8')
 
 if __name__=='__main__':
     image = cv2.imread('camels.jpg')
-    image = cv2.resize(image,(0, 0), fx = 0.2, fy = 0.2)
+    #image = cv2.resize(image,(0, 0), fx = 0.2, fy = 0.2)
     svd_compression_animation(image)
     
     
