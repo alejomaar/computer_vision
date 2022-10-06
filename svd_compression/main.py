@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 #https://zerobone.net/blog/cs/svd-image-compression/
 
 def create_video(width, height):
-    FPS = 3
-    fourcc = VideoWriter_fourcc(*'MP42')
-    video = VideoWriter('./svd_compression.avi', fourcc, float(FPS), (width, height))
+    FPS = 10
+    fourcc = VideoWriter_fourcc(*'MP4V')
+    video = VideoWriter('svd_compression.mp4', fourcc, float(FPS), (width, height))
     return video
 
 def svd_compression_animation(img):
@@ -28,21 +28,22 @@ def svd_compression_animation(img):
     
     max_rank = min(height, width)
     
-    stats(B_S,R_S,G_S,height,width,verbose=False)
+    step=2
     
-    compression_range = [0,0.02,0.03,0.05,0.08,0.10,0.12,0.14,0.16,0.18,0.20,0.24,0.28,0.35,0.4,0.45,0.5,0.6,0.7,0.8,0.9,1]
+    stats(B_S,R_S,G_S,height,width,step=step, verbose=False)
+    
+    rank_range = np.arange(1,  max_rank + 1,2)
 
     video = create_video(width, height)
     
     
-    for compression_rate in compression_range:        
+    for rank in rank_range:        
 
-        low_rank=int(compression_rate* max_rank )
-        print(f'compression rate: {round(compression_rate,3)} - rank {low_rank} of {max_rank} ')   
+        print(f'rank: {rank} - of {max_rank} ')   
     
-        R_compressed = img_approx_compressed(R_U, R_S, R_VT, low_rank)
-        G_compressed = img_approx_compressed(G_U, G_S, G_VT, low_rank)
-        B_compressed = img_approx_compressed(B_U, B_S, B_VT, low_rank)
+        R_compressed = img_approx_compressed(R_U, R_S, R_VT, rank)
+        G_compressed = img_approx_compressed(G_U, G_S, G_VT, rank)
+        B_compressed = img_approx_compressed(B_U, B_S, B_VT, rank)
             
         img_compressed = cv2.merge([B_compressed, G_compressed,  R_compressed]) 
 
@@ -66,7 +67,7 @@ def svd_compression(img,compression_rate=0.5):
     
     low_rank=int(compression_rate* max_rank)
     
-    stats(B_S,R_S,G_S,height,width,verbose=True)
+    stats(B_S,R_S,G_S,height,width,step=2, verbose=True)
         
     R_compressed = img_approx_compressed(R_U, R_S, R_VT, low_rank)
     G_compressed = img_approx_compressed(G_U, G_S, G_VT, low_rank)
@@ -78,11 +79,10 @@ def svd_compression(img,compression_rate=0.5):
     
 
     
-def stats(B_S,R_S,G_S,height,width,verbose=True):
+def stats(B_S,R_S,G_S,height,width,step=1,verbose=True):
     #Sum singular values ranks of RGB channels
     S = np.array((B_S,R_S,G_S)).sum(axis=0)
     
-    #Calculate the sum of singular values
     total_S = S.sum()
     n_components = len(S)
     rank_idx = np.arange(1,  n_components + 1)
@@ -91,6 +91,7 @@ def stats(B_S,R_S,G_S,height,width,verbose=True):
     compression_ratio = height*width/(rank_idx*(height+width+1))
         
     df =pd.DataFrame({'rank':rank_idx,'info_retained':info_retained,'compression_ratio':compression_ratio})
+    df =df[::step]
     df.to_csv('svd_rank.csv',index=False)
     
     if(verbose==True):
@@ -106,10 +107,11 @@ def img_approx_compressed(U, S, VT, k):
     return np.clip((U[:,:k] @ np.diag(S[:k])) @ VT[:k],0,255).round().astype('uint8')
 
 if __name__=='__main__':
-    image = cv2.imread('camels.jpg')
-    image = cv2.resize(image,(0, 0), fx = 0.2, fy = 0.2)
+    image = cv2.imread('lion.jpg')
+    #image = cv2.resize(image,None, fx = 0.5, fy = 0.5,interpolation=cv2.INTER_CUBIC)
+    
     #svd_compression_animation(image)
-    svd_compression(image,0.1)
+    svd_compression(image,0.03)
     
     
 
