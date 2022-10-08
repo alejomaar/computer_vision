@@ -21,16 +21,19 @@ if __name__=='__main__':
     image = cv2.imread('img/book.png',0)
     mask = cv2.imread('img/mask.png',0)
     
-    #2) Get ROI
+    #2) Remove noise of original image
+    image = cv2.GaussianBlur(image, (3, 3), 3)
+    
+    #3) Get ROI
     img_mask = cv2.bitwise_or(image, image, mask = mask)
     
-    #3 Apply different thresolding
+    #4 Apply different thresolding
     adapThresold = adaptativeThresolding(img_mask,25,7)
     meanThresold = adaptativeMean(img_mask,25,7)
     globalThresold = globalThresolding(img_mask,180)
     
-    #4 Show results 
-    titles = ['Original Image', 'Global Thresholding (v = 127)',
+    #5 Show results 
+    titles = ['Original Image', 'Global Thresholding (v = 180)',
             'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding']
     images = [image, globalThresold, meanThresold, adapThresold]
     for i in range(4):
