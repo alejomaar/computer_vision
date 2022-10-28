@@ -70,7 +70,6 @@ if __name__=='__main__':
         plt.title(titles[i])
         plt.xticks([]),plt.yticks([])
     plt.show()
-    cv2.imshow("window", img)
     
     cv2.waitKey(0)
     cv2.destroyAllWindows()
