@@ -6,10 +6,10 @@ from imutils.object_detection import non_max_suppression
 
 if __name__=='__main__':
     #1) Read images
-    image = cv2.imread('upload1.jpg')
-    img_gray=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+    img = cv2.imread('base.png')
+    img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-    template = cv2.imread('template.jpg',0)
+    template = cv2.imread('template.png',0)
     height,width= template.shape
     
     match = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
@@ -33,9 +33,9 @@ if __name__=='__main__':
     for (x1, y1, x2, y2) in boxes:
         
         # draw the bounding box on the image
-        cv2.rectangle(image, (x1, y1), (x2, y2), (255, 0, 0),2)
+        cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0),2)
 
-    cv2.imshow("window", image)
+    cv2.imshow("window", img)
     #plt.imshow(image)
     #plt.show()
     cv2.waitKey(0)
