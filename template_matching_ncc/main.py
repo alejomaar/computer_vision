@@ -40,9 +40,6 @@ if __name__=='__main__':
     matches = list(map(lambda template: cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED),templates))
     match = mixMatches(matches)
 
-    
-    plt.imshow(match,'gray')
-    plt.show()
     #4) Get coordinates of matching points using thresold
     thresh = 0.8
     (y_points, x_points) = np.where(match >= thresh)
@@ -59,11 +56,20 @@ if __name__=='__main__':
     boxes = non_max_suppression(np.array(boxes))
     print(f'There are {len(boxes)} matches')
 
+    img_final = img.copy()
     #6 Draw matchines
     for (x1, y1, x2, y2) in boxes:        
         # draw the bounding box on the image
-        cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0),2)
+        cv2.rectangle(img_final, (x1, y1), (x2, y2), (255, 0, 0),2)
 
+    images = [img,template_gray,match,img_final]
+    titles = ['Original Image', 'Template',
+            'Matching (NCC)', 'Template matching']
+    for i in range(4):
+        plt.subplot(2,2,i+1),plt.imshow(images[i],'gray')
+        plt.title(titles[i])
+        plt.xticks([]),plt.yticks([])
+    plt.show()
     cv2.imshow("window", img)
     
     cv2.waitKey(0)
