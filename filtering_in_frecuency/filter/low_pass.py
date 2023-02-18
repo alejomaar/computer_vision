@@ -5,6 +5,10 @@ class LowPass(Filter):
     def __init__(self,rows,cols) -> None:
         super().__init__(rows, cols)
         
-    def ideal(self):
+    def ideal(self,cutoff_frequency:int):
         xv,yv =self.meshgrid()
-        return xv**2 + yv**2 > 150**2
+        return xv**2 + yv**2 > cutoff_frequency**2
+    
+    def gaussian(self,cutoff_frequency:int):
+        xv,yv =self.meshgrid()        
+        return np.exp(-(xv**2 + yv**2)/(2*cutoff_frequency**2))

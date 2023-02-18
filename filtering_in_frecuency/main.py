@@ -22,19 +22,28 @@ def start():
     img = cv2.imread("city.jpg",0)
     img = cv2.resize(img, (500,300))
     h,w =  img.shape
+    
+    type = 'ideal'
+    threshold = 20
        
     fshift =  apply_fft(img)
     
     low_pass = LowPass(h,w)
     high_pass = HighPass(h,w)
     
-    mask = high_pass.ideal(20)
+    mask = high_pass.gaussian(10)
     
     fshift_edit = np.multiply(fshift,mask) 
     
-    img_back = apply_ifft(fshift_edit)
+    filtered_img = apply_ifft(fshift_edit)
     
-    plt.imshow(img_back, cmap = 'gray')
+    # Display the original image and the filtered image
+    plt.subplot(131),plt.imshow(img, cmap = 'gray')
+    plt.title('Input Image'), plt.xticks([]), plt.yticks([])
+    plt.subplot(132),plt.imshow(mask, cmap = 'gray')
+    plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
+    plt.subplot(133),plt.imshow(filtered_img, cmap = 'gray')
+    plt.title('Filtered Image'), plt.xticks([]), plt.yticks([])
     plt.show()
 
 if __name__=='__main__':    
