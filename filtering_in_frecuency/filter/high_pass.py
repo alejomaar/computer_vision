@@ -5,6 +5,6 @@ class HighPass(Filter):
     def __init__(self,rows,cols) -> None:
         super().__init__(rows, cols)
         
-    def ideal(self):
+    def ideal(self,threshold):
         xv,yv =self.meshgrid()
-        return xv**2 + yv**2 < 150**2
+        return xv**2 + yv**2 < threshold**2
