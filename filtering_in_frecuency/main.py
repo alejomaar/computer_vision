@@ -5,11 +5,11 @@ from filter.low_pass import LowPass
 from filter.high_pass import HighPass
 from enum import Enum
 
-class FrecuencyFilteringMode:
+class FrecuencyFilteringMode(Enum):
     LOW_PASS = LowPass
     HIGH_PASS = HighPass
     
-class Filter:
+class Filter(Enum):
     IDEAL = 'IDEAL'
     GAUSSIAN = 'GAUSSIAN'
     BUTTERWORTH = 'BUTTERWORTH'
@@ -17,7 +17,7 @@ class Filter:
 class FilterParameters(Enum):
     IDEAL = {'cutoff_frequency':100}
     GAUSSIAN = {'cutoff_frequency':100}
-    BUTTERWORTH = {'cutoff_frequency':100,'degree':4}
+    BUTTERWORTH = {'cutoff_frequency':100,'degree':8}
    
 def apply_fft(img: np.ndarray)-> np.ndarray:
     """
@@ -78,7 +78,7 @@ def get_filter(filter_mode,filter_type,**kwargs)->np.ndarray:
 
     Returns:
         The filter in frecuency domain.
-    """
+    """    
     if(filter_type== Filter.IDEAL):
         return filter_mode.ideal(**kwargs)
     elif(filter_type== Filter.GAUSSIAN):
@@ -99,15 +99,12 @@ def show_images(img, frecuency_filter, filtered_img):
 
 def apply_frequency_filter(img, filter_mode_option:str, filter_type_option:str, filter_params:dict):
     """Main function to read image, apply frequency filter and display results"""
-    # Read image
-    
-    rows, cols = img.shape
-    
     # Compute the 2D Fourier transform of the image   
     fshift = apply_fft(img)
     
     # Define the filter
-    filter_mode = get_filter_mode(filter_mode_option, rows, cols)
+    rows, cols = img.shape
+    filter_mode = get_filter_mode(filter_mode_option, rows, cols) ##low or high pass filter
     frequency_filter = get_filter(filter_mode, filter_type_option, **filter_params) 
     
     # Apply the filter to the magnitude spectrum    
@@ -119,14 +116,20 @@ def apply_frequency_filter(img, filter_mode_option:str, filter_type_option:str, 
     # Display the original image and the filtered image
     show_images(img,frequency_filter,filtered_img)
 
-if __name__ == '__main__':   
+if __name__ == '__main__':
+    # Read image   
     img = cv2.imread("city.jpg", 0)
     img = cv2.resize(img, (500, 300)) 
     
-    filter_chosen = Filter.BUTTERWORTH    
-    params =  FilterParameters[filter_chosen].value
+    #Select if you want LOW PASS or HIGH PASS filter
     frecuency_filtering_mode = FrecuencyFilteringMode.LOW_PASS
+    #Select the filter (BUTTERWORTH,IDEAL,GAUSSIAN) 
+    filter_chosen = Filter.IDEAL  
+    #Bind filter parameters 
+    #(Change the default values in FilterParameters or assign a dictionary with the parameters directly)
+    params =  FilterParameters[filter_chosen.value].value
     
+    print(f'Apply {filter_chosen.name} {frecuency_filtering_mode.name} filter with params: {params}')
     
     apply_frequency_filter(img,frecuency_filtering_mode,filter_chosen,params)
     

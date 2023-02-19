@@ -8,7 +8,7 @@ class LowPass(Filter):
     def ideal(self,cutoff_frequency:int):
         xv,yv =self.meshgrid()
         distance_square =  xv**2 + yv**2
-        return distance_square > cutoff_frequency**2
+        return distance_square < cutoff_frequency**2
     
     def gaussian(self,cutoff_frequency:int):
         xv,yv =self.meshgrid()  
