@@ -88,7 +88,7 @@ def get_filter(filter_mode,filter_type,**kwargs)->np.ndarray:
     else:
         raise Exception("Sorry, no filter available")
     
-def show_images(img, frecuency_filter, filtered_img):
+def show_images(img:np.ndarray, frecuency_filter:np.ndarray, filtered_img:np.ndarray)->None:
     plt.subplot(131), plt.imshow(img, cmap='gray')
     plt.title('Input Image'), plt.xticks([]), plt.yticks([])
     plt.subplot(132), plt.imshow(frecuency_filter, cmap='gray')
@@ -97,7 +97,7 @@ def show_images(img, frecuency_filter, filtered_img):
     plt.title('Filtered Image'), plt.xticks([]), plt.yticks([])
     plt.show()
 
-def apply_frequency_filter(img, filter_mode_option:str, filter_type_option:str, filter_params:dict):
+def apply_frequency_filter(img:np.ndarray, filter_mode_option:str, filter_type_option:str, filter_params:dict):
     """Main function to read image, apply frequency filter and display results"""
     # Compute the 2D Fourier transform of the image   
     fshift = apply_fft(img)
