@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from filter.low_pass import LowPass
 from filter.high_pass import HighPass
+from enum import Enum
 
 class FrecuencyFilteringMode:
     LOW_PASS = LowPass
@@ -12,6 +13,11 @@ class Filter:
     IDEAL = 'IDEAL'
     GAUSSIAN = 'GAUSSIAN'
     BUTTERWORTH = 'BUTTERWORTH'
+    
+class FilterParameters(Enum):
+    IDEAL = {'cutoff_frequency':100}
+    GAUSSIAN = {'cutoff_frequency':100}
+    BUTTERWORTH = {'cutoff_frequency':100,'degree':4}
    
 def apply_fft(img: np.ndarray)-> np.ndarray:
     """
@@ -116,8 +122,13 @@ def apply_frequency_filter(img, filter_mode_option:str, filter_type_option:str, 
 if __name__ == '__main__':   
     img = cv2.imread("city.jpg", 0)
     img = cv2.resize(img, (500, 300)) 
-    params= {'cutoff_frequency':100,'degree':4}
-    apply_frequency_filter(img,FrecuencyFilteringMode.LOW_PASS,Filter.BUTTERWORTH,params)
+    
+    filter_chosen = Filter.BUTTERWORTH    
+    params =  FilterParameters[filter_chosen].value
+    frecuency_filtering_mode = FrecuencyFilteringMode.LOW_PASS
+    
+    
+    apply_frequency_filter(img,frecuency_filtering_mode,filter_chosen,params)
     
 
 
