@@ -6,6 +6,15 @@ class Filter:
         self.cols = cols
         
     def meshgrid(self):
+        """
+        Create a mesh grid of coordinates centered around the center.
+
+        Returns
+        -------
+        xv, yv : 2D arrays
+            Arrays containing the x and y coordinates of the mesh grid.
+
+        """
         center_row = int(self.rows/2)
         center_cols = int(self.cols/2)
         
