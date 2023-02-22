@@ -5,6 +5,8 @@ from filter.low_pass import LowPass
 from filter.high_pass import HighPass
 from enum import Enum
 
+#Complementary resource: https://www.dsi.unive.it/~bergamasco/teachingfiles/cvslides/5_filtering_in_frequency_domain.pdf
+
 class FrecuencyFilteringMode(Enum):
     LOW_PASS = LowPass
     HIGH_PASS = HighPass
