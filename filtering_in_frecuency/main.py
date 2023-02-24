@@ -4,8 +4,15 @@ import matplotlib.pyplot as plt
 from filter.low_pass import LowPass
 from filter.high_pass import HighPass
 from enum import Enum
+from cv2 import VideoWriter, VideoWriter_fourcc
 
 #Complementary resource: https://www.dsi.unive.it/~bergamasco/teachingfiles/cvslides/5_filtering_in_frequency_domain.pdf
+
+def create_video(width, height,video_file='output.mp4'):
+    FPS = 10
+    fourcc = VideoWriter_fourcc(*'mp4v')
+    video = VideoWriter(f'{video_file}', fourcc, float(FPS), (width, height))
+    return video
 
 class FrecuencyFilteringMode(Enum):
     LOW_PASS = LowPass
@@ -115,25 +122,49 @@ def apply_frequency_filter(img:np.ndarray, filter_mode_option:str, filter_type_o
     # Compute the inverse Fourier transform to obtain the filtered image
     filtered_img = apply_ifft(filtered_spectrum)
     
+    return dict(
+        frequency_filter=frequency_filter,
+        filtered_img=filtered_img
+    )
+
+    
+    
+    
+def filter_image(img):
+    #Select if you want LOW PASS or HIGH PASS filter
+    frecuency_filtering_mode = FrecuencyFilteringMode.LOW_PASS
+    #Select the filter (BUTTERWORTH,IDEAL,GAUSSIAN) 
+    filter_chosen = Filter.IDEAL  
+    #Bind filter parameters (Change the default values in FilterParameters or assign a dictionary with the parameters directly)
+    params =  FilterParameters[filter_chosen.value].value
+
+    print(f'Apply {filter_chosen.name} {frecuency_filtering_mode.name} filter with params: {params}')
+    output = apply_frequency_filter(img,frecuency_filtering_mode,filter_chosen,params)
     # Display the original image and the filtered image
-    show_images(img,frequency_filter,filtered_img)
+    show_images(img,output['frequency_filter'],output['filtered_img'])
+    
+def filter_video(img):
+    #Select if you want LOW PASS or HIGH PASS filter
+    frecuency_filtering_mode = FrecuencyFilteringMode.LOW_PASS
+    #Select the filter (BUTTERWORTH,IDEAL,GAUSSIAN) 
+    filter_chosen = Filter.IDEAL  
+    h, w = img.shape
+    video = create_video(w,h)
+    for cutoff_frequency in range(0,200,10):
+        params = {'cutoff_frequency':cutoff_frequency}
+        print(params)
+        #output = apply_frequency_filter(img,frecuency_filtering_mode,filter_chosen,params)
+        #video.write(output['filtered_img'])
+    
+    video.release()
 
 if __name__ == '__main__':
     # Read image   
     img = cv2.imread("city.jpg", 0)
     img = cv2.resize(img, (500, 300)) 
     
-    #Select if you want LOW PASS or HIGH PASS filter
-    frecuency_filtering_mode = FrecuencyFilteringMode.LOW_PASS
-    #Select the filter (BUTTERWORTH,IDEAL,GAUSSIAN) 
-    filter_chosen = Filter.IDEAL  
-    #Bind filter parameters 
-    #(Change the default values in FilterParameters or assign a dictionary with the parameters directly)
-    params =  FilterParameters[filter_chosen.value].value
-    
-    print(f'Apply {filter_chosen.name} {frecuency_filtering_mode.name} filter with params: {params}')
-    
-    apply_frequency_filter(img,frecuency_filtering_mode,filter_chosen,params)
+    filter_image(img)
+
     
 
 
