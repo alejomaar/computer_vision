@@ -9,8 +9,8 @@ from cv2 import VideoWriter, VideoWriter_fourcc
 #Complementary resource: https://www.dsi.unive.it/~bergamasco/teachingfiles/cvslides/5_filtering_in_frequency_domain.pdf
 
 def create_video(width, height,video_file='output.mp4'):
-    FPS = 10
-    fourcc = VideoWriter_fourcc(*'MP4V')
+    FPS = 4
+    fourcc = VideoWriter_fourcc(*'mp4v')
     video = VideoWriter(f'{video_file}', fourcc, float(FPS), (width, height))
     return video
 
@@ -147,22 +147,17 @@ def filter_video(img):
     #Select if you want LOW PASS or HIGH PASS filter
     frecuency_filtering_mode = FrecuencyFilteringMode.LOW_PASS
     #Select the filter (BUTTERWORTH,IDEAL,GAUSSIAN) 
-    filter_chosen = Filter.IDEAL  
+    filter_chosen = Filter.GAUSSIAN  
     h, w = img.shape
     video = create_video(w,h,f'video.mp4')
-    for cutoff_frequency in range(20,80,20):
+    for cutoff_frequency in range(20,200,5):
         params = {'cutoff_frequency':cutoff_frequency}
-        print(params)
+        #print(params)
         output = apply_frequency_filter(img,frecuency_filtering_mode,filter_chosen,params)
-        filtered_img = output['filtered_img'].astype(np.uint8)
-        backtorgb = cv2.cvtColor(filtered_img,cv2.COLOR_GRAY2RGB)
-        print(backtorgb.shape)
-        print(np.unique(backtorgb))
-        plt.subplot(131), 
-        #plt.imshow(filtered_img, cmap='gray')
-        plt.imshow(backtorgb)
-        plt.show()
+        filtered_img = np.clip(output['filtered_img'],0,255).round().astype('uint8')
+        backtorgb = cv2.cvtColor(filtered_img,cv2.COLOR_GRAY2RGB) 
         video.write(backtorgb)
+        
     
     video.release()
 
