@@ -10,7 +10,7 @@ from cv2 import VideoWriter, VideoWriter_fourcc
 
 def create_video(width, height,video_file='output.mp4'):
     FPS = 10
-    fourcc = VideoWriter_fourcc(*'mp4v')
+    fourcc = VideoWriter_fourcc(*'MP4V')
     video = VideoWriter(f'{video_file}', fourcc, float(FPS), (width, height))
     return video
 
@@ -149,21 +149,30 @@ def filter_video(img):
     #Select the filter (BUTTERWORTH,IDEAL,GAUSSIAN) 
     filter_chosen = Filter.IDEAL  
     h, w = img.shape
-    video = create_video(w,h)
-    for cutoff_frequency in range(0,200,10):
+    video = create_video(w,h,f'video.mp4')
+    for cutoff_frequency in range(20,80,20):
         params = {'cutoff_frequency':cutoff_frequency}
         print(params)
-        #output = apply_frequency_filter(img,frecuency_filtering_mode,filter_chosen,params)
-        #video.write(output['filtered_img'])
+        output = apply_frequency_filter(img,frecuency_filtering_mode,filter_chosen,params)
+        filtered_img = output['filtered_img'].astype(np.uint8)
+        backtorgb = cv2.cvtColor(filtered_img,cv2.COLOR_GRAY2RGB)
+        print(backtorgb.shape)
+        print(np.unique(backtorgb))
+        plt.subplot(131), 
+        #plt.imshow(filtered_img, cmap='gray')
+        plt.imshow(backtorgb)
+        plt.show()
+        video.write(backtorgb)
     
     video.release()
 
 if __name__ == '__main__':
     # Read image   
-    img = cv2.imread("city.jpg", 0)
+    img = cv2.imread("city.jpg")
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = cv2.resize(img, (500, 300)) 
     
-    filter_image(img)
+    filter_video(img)
 
     
 
