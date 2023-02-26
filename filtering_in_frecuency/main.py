@@ -150,15 +150,15 @@ def filter_video(img):
     filter_chosen = Filter.GAUSSIAN  
     h, w = img.shape
     video = create_video(w,h,f'video.mp4')
+    #Create a video for multiple cuttof frequency
     for cutoff_frequency in range(20,200,5):
         params = {'cutoff_frequency':cutoff_frequency}
-        #print(params)
         output = apply_frequency_filter(img,frecuency_filtering_mode,filter_chosen,params)
         filtered_img = np.clip(output['filtered_img'],0,255).round().astype('uint8')
         backtorgb = cv2.cvtColor(filtered_img,cv2.COLOR_GRAY2RGB) 
+        #push frame
         video.write(backtorgb)
-        
-    
+    #export video 
     video.release()
 
 if __name__ == '__main__':
