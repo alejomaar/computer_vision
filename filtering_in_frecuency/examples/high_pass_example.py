@@ -1,6 +1,6 @@
 import cv2
 from visualization import show_images
-from filter.filter import apply_low_pass
+from filter.filter import apply_high_pass
 
 
 if __name__ == '__main__':
@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # Aplicar el filtro de paso bajo con una frecuencia de corte de 30 Hz
     filter_type = "gaussiano"
     filter_params = {"cutoff_frequency": 30}
-    filtered_img, filtered_spectrum = apply_low_pass(img, filter_type, filter_params)
+    filtered_img, filtered_spectrum = apply_high_pass(img, filter_type, filter_params)
     print(filtered_img.dtype)
     
     show_images(img,filtered_img,filtered_spectrum)
