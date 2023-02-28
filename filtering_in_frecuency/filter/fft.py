@@ -45,6 +45,6 @@ def apply_ifft(fshift: np.ndarray) -> np.ndarray:
     f_ishift = np.fft.ifftshift(fshift)
     img_back = np.fft.ifft2(f_ishift)
     img_back = np.abs(img_back)
-    #img_back = np.clip(img_back,0,255).round().astype('uint8')
+    img_back = np.clip(img_back,0,255).round().astype('uint8')
     
     return img_back
