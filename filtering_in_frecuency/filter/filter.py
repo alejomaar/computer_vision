@@ -1,24 +1,74 @@
 import numpy as np
+from .fft import apply_fft,apply_ifft
+from .low_pass import LowPass
+from .high_pass import HighPass
 
-class Filter:
-    def __init__(self,rows,cols) -> None:
-        self.rows = rows
-        self.cols = cols
-        
-    def meshgrid(self):
-        """
-        Create a mesh grid of coordinates centered around the center.
+def get_filter(img:np.ndarray, is_high_pass_filter:bool, filter_type:str, **kwargs):
+    """
+    Returns the filter for a given image, filter type, and parameters.
+    
+    Parameters:
+        img (numpy.ndarray): Input image.
+        is_high_pass_filter (bool): Whether to apply a high-pass filter instead of a low-pass filter.
+        filter_type (str): Type of filter to apply ("ideal", "gaussian", or "butterworth").
+        **kwargs: Additional arguments required to construct the filter.
+    
+    Returns:
+        numpy.ndarray: Filter.
+    """
+    rows, cols = img.shape
+    if is_high_pass_filter:
+        filter = LowPass(rows, cols)
+    else:
+        filter = HighPass(rows, cols)
 
-        Returns
-        -------
-        xv, yv : 2D arrays
-            Arrays containing the x and y coordinates of the mesh grid.
+    if filter_type == "ideal":
+        low_pass_filter = filter.ideal(**kwargs)
+    elif filter_type == "gaussiano":
+        low_pass_filter = filter.gaussian(**kwargs)
+    elif filter_type == "butterworth":
+        low_pass_filter = filter.butterworth(**kwargs)
+    else:
+        raise ValueError("Tipo de filtro no válido")
 
-        """
-        center_row = int(self.rows/2)
-        center_cols = int(self.cols/2)
-        
-        x = np.linspace(0, self.cols, self.cols)- center_cols
-        y = np.linspace(0, self.rows, self.rows) -center_row
-        xv, yv = np.meshgrid(x, y)
-        return xv, yv
+    return low_pass_filter
+
+def apply_filter(img:np.ndarray, is_high_pass_filter:bool, filter_type:str, filter_params:dict):
+    """
+    Applies a filter to the input image and returns the filtered image and frequency domain representation.
+    
+    Parameters:
+        img (numpy.ndarray): Input image.
+        is_high_pass_filter (bool): Whether to apply a high-pass filter instead of a low-pass filter.
+        filter_type (str): Type of filter to apply ("ideal", "gaussian", or "butterworth").
+        filter_params (dict): Dictionary of filter parameters.
+    
+    Returns:
+        dict: Dictionary with keys "frequency_filter" and "filtered_img", containing the frequency domain representation 
+              of the filtered image and the filtered image itself, respectively.
+    """
+    
+    # Compute the 2D Fourier transform of the image
+    fshift = apply_fft(img)
+
+    # Obtain the filter
+    filter = get_filter(img, is_high_pass_filter, filter_type, **filter_params)
+
+    # Apply the filter to the spectrum
+    filtered_spectrum = np.multiply(fshift, filter)
+
+    # Compute the inverse Fourier transform to obtain the filtered image
+    filtered_img = apply_ifft(filtered_spectrum)
+
+    return filtered_img, filtered_spectrum
+
+    
+def apply_low_pass(img:np.ndarray, filter_type:str, filter_params:dict):
+    """ Applies a low-pass filter to the input image and returns the filtered image
+    """    
+    return apply_filter(img,False, filter_type, filter_params)
+
+def apply_high_pass(img:np.ndarray, filter_type:str, filter_params:dict):
+    """ Applies a high-pass filter to the input image and returns the filtered image
+    """   
+    return apply_filter(img,True, filter_type, filter_params)
