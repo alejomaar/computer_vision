@@ -5,13 +5,23 @@ import dash_core_components as dcc
 from dash.dependencies import Output, Input
 import base64
 
-# Carga las dos imágenes
-img1 = cv2.imread('img1.png')
-img2 = cv2.imread('img2.png')
+refresh_rate = 500
+# Carga la imagen
+img = cv2.imread('img3.png')
 
-# Codifica las imágenes en base64 para mostrarlas en Dash
-img1_base64 = base64.b64encode(cv2.imencode('.png', img1)[1]).decode('utf-8')
-img2_base64 = base64.b64encode(cv2.imencode('.png', img2)[1]).decode('utf-8')
+# Escalas de filtro gaussiano
+scales = list(range(2,20))
+
+def apply_gaussian_filter(img, scales):
+    return [cv2.blur(img, (scale, scale)) for scale in scales]
+
+def encode_images(images):
+    return [base64.b64encode(cv2.imencode('.png', img)[1]).decode('utf-8') for img in images]
+
+# Aplica el filtro gaussiano y crea los objetos de gráfico de plotly
+filtered_imgs = apply_gaussian_filter(img, scales)
+encoded_imgs = encode_images(filtered_imgs)
+
 
 # Crea la aplicación de Dash
 app = dash.Dash(__name__)
@@ -19,11 +29,11 @@ app = dash.Dash(__name__)
 # Define el layout de la aplicación de Dash
 app.layout = html.Div([
     html.Div([
-        html.Img(id='image', src='data:image/png;base64,{}'.format(img1_base64)),
+        html.Img(id='image', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
     ], style={'textAlign': 'center'}),
     dcc.Interval(
         id='interval-component',
-        interval=3000, # Actualiza la imagen cada 3 segundos
+        interval=refresh_rate, 
         n_intervals=0
     )
 ])
@@ -31,10 +41,9 @@ app.layout = html.Div([
 # Define la función de actualización de la imagen
 @app.callback(Output('image', 'src'), [Input('interval-component', 'n_intervals')])
 def update_image(n):
-    if n % 2 == 0:
-        return 'data:image/png;base64,{}'.format(img1_base64)
-    else:
-        return 'data:image/png;base64,{}'.format(img2_base64)
+    index = n%len(scales)
+    return 'data:image/png;base64,{}'.format(encoded_imgs[index])
+
 
 # Ejecuta la aplicación de Dash
 if __name__ == '__main__':
