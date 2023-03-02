@@ -4,16 +4,24 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Output, Input
 import base64
+from filter.filter import apply_low_pass
 
-refresh_rate = 500
+
+refresh_rate = 200
 # Carga la imagen
-img = cv2.imread('img3.png')
+img = cv2.imread('img3.png',0)
 
 # Escalas de filtro gaussiano
-scales = list(range(2,20))
+scales = list(range(10,120,2))
 
 def apply_gaussian_filter(img, scales):
-    return [cv2.blur(img, (scale, scale)) for scale in scales]
+    filter_type = "gaussiano"
+    def filtering(img,cutoff_frequency):        
+        filter_params = {"cutoff_frequency": cutoff_frequency}
+        filtered_img, filtered_spectrum = apply_low_pass(img, filter_type, filter_params)
+        return filtered_img
+    
+    return [filtering(img,scale) for scale in scales]
 
 def encode_images(images):
     return [base64.b64encode(cv2.imencode('.png', img)[1]).decode('utf-8') for img in images]
