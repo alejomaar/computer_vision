@@ -37,13 +37,26 @@ app = dash.Dash(__name__)
 # Define el layout de la aplicación de Dash
 app.layout = html.Div([
     html.Div([
+        html.H2('Imagen 1'),
         html.Img(id='image', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-    ], style={'textAlign': 'center'}),
+    ], className="six_columns"),
     dcc.Interval(
         id='interval-component',
         interval=refresh_rate, 
         n_intervals=0
-    )
+    ),
+    html.Div([
+        html.H2('Imagen 1'),
+        html.Img(id='image2', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+    ], className="six columns"),
+    html.Div([
+        html.H2('Imagen 1'),
+        html.Img(id='image3', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+    ], className="six columns"),
+    html.Div([
+        html.H2('Imagen 1'),
+        html.Img(id='image4', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+    ], className="six columns"),
 ])
 
 # Define la función de actualización de la imagen
