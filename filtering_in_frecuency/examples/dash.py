@@ -10,6 +10,7 @@ from filter.filter import apply_low_pass
 refresh_rate = 200
 # Carga la imagen
 img = cv2.imread('img3.png',0)
+img =  cv2.resize(img,None, fx = 0.5, fy = 0.5)
 
 # Escalas de filtro gaussiano
 scales = list(range(10,120,2))
@@ -39,7 +40,7 @@ app.layout = html.Div([
     html.Div([
         html.H2('Imagen 1'),
         html.Img(id='image', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-    ], className="six_columns"),
+    ], style = {'width': '40%'}),
     dcc.Interval(
         id='interval-component',
         interval=refresh_rate, 
@@ -48,16 +49,16 @@ app.layout = html.Div([
     html.Div([
         html.H2('Imagen 1'),
         html.Img(id='image2', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-    ], className="six columns"),
+    ], style = {'width': '40%'}),
     html.Div([
         html.H2('Imagen 1'),
         html.Img(id='image3', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-    ], className="six columns"),
+    ], style = {'width': '40%'}),
     html.Div([
         html.H2('Imagen 1'),
         html.Img(id='image4', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-    ], className="six columns"),
-])
+    ], style = {'width': '40%','flex-wrap':'wrap'}),
+],style = {'display': 'flex'})
 
 # Define la función de actualización de la imagen
 @app.callback(Output('image', 'src'), [Input('interval-component', 'n_intervals')])
