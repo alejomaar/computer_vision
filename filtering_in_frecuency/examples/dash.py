@@ -3,6 +3,7 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Output, Input
+import dash_bootstrap_components as dbc
 import base64
 from filter.filter import apply_low_pass
 
@@ -10,7 +11,7 @@ from filter.filter import apply_low_pass
 refresh_rate = 200
 # Carga la imagen
 img = cv2.imread('img3.png',0)
-img =  cv2.resize(img,None, fx = 0.5, fy = 0.5)
+#img =  cv2.resize(img,None, fx = 0.5, fy = 0.5)
 
 # Escalas de filtro gaussiano
 scales = list(range(10,120,2))
@@ -33,38 +34,51 @@ encoded_imgs = encode_images(filtered_imgs)
 
 
 # Crea la aplicación de Dash
-app = dash.Dash(__name__)
+app = dash.Dash(
+    external_stylesheets=[dbc.themes.BOOTSTRAP]
+)
+
+'''dcc.Interval(
+                id='interval-component',
+                interval=refresh_rate, 
+                n_intervals=0
+),'''
+
+#,className="img-fluid"
 
 # Define el layout de la aplicación de Dash
-app.layout = html.Div([
-    html.Div([
-        html.H2('Imagen 1'),
-        html.Img(id='image', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-    ], style = {'width': '40%'}),
-    dcc.Interval(
-        id='interval-component',
-        interval=refresh_rate, 
-        n_intervals=0
+app.layout = dbc.Container([
+    html.H1('Filtros en frecuencia'),
+    dbc.Row(
+        [
+            dbc.Col([
+                html.H2('Input'),
+                html.Img(id='image1', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+            ], width=3),
+            dbc.Col([
+                html.H2('Filter image'),
+                html.Img(id='image2', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+            ], width=3)
+        ],
     ),
-    html.Div([
-        html.H2('Imagen 1'),
-        html.Img(id='image2', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-    ], style = {'width': '40%'}),
-    html.Div([
-        html.H2('Imagen 1'),
-        html.Img(id='image3', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-    ], style = {'width': '40%'}),
-    html.Div([
-        html.H2('Imagen 1'),
-        html.Img(id='image4', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-    ], style = {'width': '40%','flex-wrap':'wrap'}),
-],style = {'display': 'flex'})
+    dbc.Row(
+        [
+            dbc.Col([
+                html.H2('FFT Filter'),
+                html.Img(id='image3', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+            ], width=3),
+            dbc.Col([
+                html.H2('Filter function'),
+                html.Img(id='image4', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+            ], width=3)
+        ])
+    ])
 
 # Define la función de actualización de la imagen
-@app.callback(Output('image', 'src'), [Input('interval-component', 'n_intervals')])
+'''@app.callback(Output('image1', 'src'), [Input('interval-component', 'n_intervals')])
 def update_image(n):
     index = n%len(scales)
-    return 'data:image/png;base64,{}'.format(encoded_imgs[index])
+    return 'data:image/png;base64,{}'.format(encoded_imgs[index])'''
 
 
 # Ejecuta la aplicación de Dash
