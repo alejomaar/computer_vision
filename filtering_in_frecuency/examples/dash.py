@@ -38,11 +38,6 @@ app = dash.Dash(
     external_stylesheets=[dbc.themes.BOOTSTRAP]
 )
 
-'''dcc.Interval(
-                id='interval-component',
-                interval=refresh_rate, 
-                n_intervals=0
-),'''
 
 #,className="img-fluid"
 
@@ -53,32 +48,39 @@ app.layout = dbc.Container([
         [
             dbc.Col([
                 html.H2('Input'),
-                html.Img(id='image1', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+                html.Img(id='image1', src='data:image/png;base64,{}'.format(img)),
             ], width=3),
             dbc.Col([
                 html.H2('Filter image'),
-                html.Img(id='image2', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-            ], width=3)
+                html.Img(id='filter_image', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+            ], width=3),
+            dcc.Interval(
+                id='interval-component',
+                interval=refresh_rate, 
+                n_intervals=0
+            )
         ],
     ),
     dbc.Row(
         [
             dbc.Col([
                 html.H2('FFT Filter'),
-                html.Img(id='image3', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+                html.Img(id='fft_filter', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
             ], width=3),
             dbc.Col([
                 html.H2('Filter function'),
-                html.Img(id='image4', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+                html.Img(id='function', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
             ], width=3)
         ])
-    ])
+    ],
+    
+    )
+    
 
-# Define la función de actualización de la imagen
-'''@app.callback(Output('image1', 'src'), [Input('interval-component', 'n_intervals')])
+@app.callback(Output('image1', 'src'), [Input('interval-component', 'n_intervals')])
 def update_image(n):
     index = n%len(scales)
-    return 'data:image/png;base64,{}'.format(encoded_imgs[index])'''
+    return 'data:image/png;base64,{}'.format(encoded_imgs[index])
 
 
 # Ejecuta la aplicación de Dash
