@@ -58,8 +58,10 @@ def apply_filter(img:np.ndarray, is_high_pass:bool, filter_type:str, filter_para
 
     # Compute the inverse Fourier transform to obtain the filtered image
     filtered_img = apply_ifft(filtered_spectrum)
-
-    return filtered_img, filter
+    
+    
+    #,np.log(abs(fshift))
+    return filtered_img, np.log(abs(filtered_spectrum+1))
 
     
 def apply_low_pass(img:np.ndarray, filter_type:str, filter_params:dict):

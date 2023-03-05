@@ -16,10 +16,10 @@ img = cv2.imread('img3.png',0)
 #img =  cv2.resize(img,None, fx = 0.5, fy = 0.5)
 
 # Escalas de filtro gaussiano
-scales = list(range(10,120,2))
+scales = list(range(10,100,5))
 
 def apply_gaussian_filter(img, scales):
-    filter_type = "gaussiano"
+    filter_type = "ideal"
     def filtering(img,cutoff_frequency):        
         filter_params = {"cutoff_frequency": cutoff_frequency}
         filtered_img, filtered_spectrum = apply_low_pass(img, filter_type, filter_params)
@@ -46,7 +46,7 @@ def convert_image_to_base64(image):
     buffer = io.BytesIO()
 
     # Guardar la imagen en formato png en el objeto de memoria en BytesIO
-    fig.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
+    fig.savefig(buffer, format='png', dpi=100, bbox_inches='tight', transparent="True", pad_inches=0)
 
     # Convertir la imagen png en base64
     buffer.seek(0)
@@ -80,11 +80,11 @@ app.layout = dbc.Container([
             dbc.Col([
                 html.H2('Input'),
                 html.Img(id='image1', src='data:image/png;base64,{}'.format(img)),
-            ], width=3),
+            ], width=2),
             dbc.Col([
                 html.H2('Filter image'),
                 html.Img(id='filter_image', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-            ], width=3),
+            ], width=2),
             dcc.Interval(
                 id='interval-component',
                 interval=refresh_rate, 
@@ -97,11 +97,11 @@ app.layout = dbc.Container([
             dbc.Col([
                 html.H2('FFT Filter'),
                 html.Img(id='fft_filter', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-            ], width=3),
+            ], width=2),
             dbc.Col([
                 html.H2('Filter function'),
                 html.Img(id='function', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
-            ], width=3)
+            ], width=2)
         ])
     ],
     
