@@ -9,6 +9,9 @@ from filter.filter import apply_low_pass
 import matplotlib.pyplot as plt
 import io
 
+def normalize_uint8(img):
+    return cv2.normalize(img, None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
+
 
 refresh_rate = 200
 # Carga la imagen
@@ -23,11 +26,11 @@ def apply_gaussian_filter(img, scales):
     def filtering(img,cutoff_frequency):        
         filter_params = {"cutoff_frequency": cutoff_frequency}
         filtered_img, filtered_spectrum = apply_low_pass(img, filter_type, filter_params)
-        return filtered_img
+        return normalize_uint8(filtered_img)
     def filtering_spectrum(img,cutoff_frequency):        
         filter_params = {"cutoff_frequency": cutoff_frequency}
         filtered_img, filtered_spectrum = apply_low_pass(img, filter_type, filter_params)
-        return filtered_spectrum
+        return normalize_uint8(filtered_spectrum)
 
     return {'filtered_img': [filtering(img,scale) for scale in scales],
             'filtered_spectrum': [filtering_spectrum(img,scale) for scale in scales] }
@@ -35,33 +38,11 @@ def apply_gaussian_filter(img, scales):
 def encode_images(images):
     return [base64.b64encode(cv2.imencode('.png', img)[1]).decode('utf-8') for img in images]
 
-def convert_image_to_base64(image):
-    # Crear una figura y agregar la imagen a la figura
-    fig = plt.figure(figsize=(image.shape[0]/100, image.shape[1]/100), dpi=100)
-    ax = fig.add_subplot(111)
-    ax.imshow(image)
-    ax.axis('off')
-
-    # Crear un objeto de memoria en BytesIO
-    buffer = io.BytesIO()
-
-    # Guardar la imagen en formato png en el objeto de memoria en BytesIO
-    fig.savefig(buffer, format='png', dpi=100, bbox_inches='tight', transparent="True", pad_inches=0)
-
-    # Convertir la imagen png en base64
-    buffer.seek(0)
-    image_png = buffer.getvalue()
-    image_base64 = base64.b64encode(image_png).decode('utf-8')
-
-    return image_base64
-
-def encode_plot(images):
-    return [convert_image_to_base64(img) for img in images]
 
 # Aplica el filtro gaussiano y crea los objetos de gráfico de plotly
 output = apply_gaussian_filter(img, scales)
 encoded_imgs = encode_images(output['filtered_img'])
-encoded_filtering = encode_plot(output['filtered_spectrum'])
+encoded_filtering = encode_images(output['filtered_spectrum'])
 
 
 # Crea la aplicación de Dash
