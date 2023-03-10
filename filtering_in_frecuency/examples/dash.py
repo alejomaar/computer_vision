@@ -6,11 +6,12 @@ from dash.dependencies import Output, Input
 import dash_bootstrap_components as dbc
 import base64
 from filter.filter import apply_low_pass
-import matplotlib.pyplot as plt
-import io
+from filter.fft import apply_fft
+import numpy as np
 
 # Load image
-img = cv2.imread('img3.png',0)
+IMG_FILE = 'img3.png'
+img = cv2.imread(IMG_FILE, 0)
 
 # Define filter type and filter cuttof ranges
 filter_type = "ideal"
@@ -19,6 +20,11 @@ cuttof_frecuency_range = list(range(10,100,5))
 #Animation rate
 refresh_rate = 200
 
+def original_fft_magnitude(img):
+    fshift = apply_fft(img)
+    fft_mag_log = np.log(abs(fshift+1))
+    normalize = normalize_uint8(fft_mag_log)
+    return image_to_base64(normalize)
 
 def normalize_uint8(img):
     return cv2.normalize(img, None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
@@ -50,15 +56,11 @@ encoded_imgs = encode_images(filter_imgs)
 encoded_filtering = encode_images(filter_spectrums)
 
 
-# Crea la aplicación de Dash
+# Create Dash application
 app = dash.Dash(
     external_stylesheets=[dbc.themes.BOOTSTRAP]
 )
 
-
-#,className="img-fluid"
-
-# Define el layout de la aplicación de Dash
 app.layout = dbc.Container([
     html.H1('Frecuency filters'),
     dbc.Row(
@@ -86,7 +88,7 @@ app.layout = dbc.Container([
             ], width=2),
             dbc.Col([
                 html.H2('Filter function'),
-                html.Img(id='function', src= encoded_filtering[-1]),
+                html.Img(id='function', src= original_fft_magnitude(img)),
             ], width=2)
         ])
     ],
@@ -101,6 +103,6 @@ def update_image(n):
     src_image_2 = encoded_filtering[index]
     return [src_image_1, src_image_2]
 
-# Ejecuta la aplicación de Dash
+# Run Dash application
 if __name__ == '__main__':
     app.run_server(debug=True)
