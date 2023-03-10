@@ -5,17 +5,18 @@ import dash_core_components as dcc
 from dash.dependencies import Output, Input
 import dash_bootstrap_components as dbc
 import base64
-from filter.filter import apply_low_pass
-from filter.fft import apply_fft
 import numpy as np
 
+from preprocessing.filter import apply_low_pass
+from preprocessing.fft import apply_fft
+
 # Load image
-IMG_FILE = 'img3.png'
+IMG_FILE = 'img/city.png'
 img = cv2.imread(IMG_FILE, 0)
 
 # Define filter type and filter cuttof ranges
 filter_type = "ideal"
-cuttof_frecuency_range = list(range(10,100,5))
+cuttof_frecuencies = list(range(10,100,5))
 
 #Animation rate
 refresh_rate = 200
@@ -37,19 +38,19 @@ def encode_images(images):
     return [image_to_base64(img) for img in images]
 
 
-def apply_gaussian_filter(img, scales):
+def apply_gaussian_filter(img, cuttof_frecuencies):
     filtered_images = []
     filtered_spectra = []
-    for cutoff_frequency in scales:
-        filtered_image, filtered_spectrum = apply_low_pass(img, filter_type, {"cutoff_frequency": cutoff_frequency})
+    for cutoff_frequency in cuttof_frecuencies:
+        filter_params = {"cutoff_frequency": cutoff_frequency}
+        filtered_image, filtered_spectrum = apply_low_pass(img, filter_type, filter_params)
         filtered_images.append(normalize_uint8(filtered_image))
         filtered_spectra.append(normalize_uint8(filtered_spectrum))
-
     return filtered_images, filtered_spectra
 
 
 # Apply low-pass frequency filter
-filter_imgs, filter_spectrums = apply_gaussian_filter(img, cuttof_frecuency_range)
+filter_imgs, filter_spectrums = apply_gaussian_filter(img, cuttof_frecuencies)
 
 # Encode filter images in base 64
 encoded_imgs = encode_images(filter_imgs)
@@ -66,11 +67,11 @@ app.layout = dbc.Container([
     dbc.Row(
         [
             dbc.Col([
-                html.H2('Input Image'),
+                html.H2('Original Image'),
                 html.Img(id='image1', src=image_to_base64(img)),
             ], width=2),
             dbc.Col([
-                html.H2('Filter image'),
+                html.H2('Low pass filter image'),
                 html.Img(id='filter_image', src=encoded_imgs[0]),
             ], width=2),
             dcc.Interval(
@@ -83,22 +84,22 @@ app.layout = dbc.Container([
     dbc.Row(
         [
             dbc.Col([
-                html.H2('FFT Filter'),
-                html.Img(id='fft_filter', src=encoded_filtering[0]),
+                html.H2('FFT in the original image'),
+                html.Img(id='function', src= original_fft_magnitude(img)),
             ], width=2),
             dbc.Col([
-                html.H2('Filter function'),
-                html.Img(id='function', src= original_fft_magnitude(img)),
-            ], width=2)
+                html.H2('FFT low pass filter image'),
+                html.Img(id='fft_filter', src=encoded_filtering[0]),
+            ], width=2) 
         ])
     ],
     
     )
     
 
-@app.callback(Output('image1', 'src'), Output('fft_filter', 'src'), [Input('interval-component', 'n_intervals')])
+@app.callback(Output('filter_image', 'src'), Output('fft_filter', 'src'), [Input('interval-component', 'n_intervals')])
 def update_image(n):
-    index = n%len(cuttof_frecuency_range)
+    index = n%len(cuttof_frecuencies)
     src_image_1 = encoded_imgs[index]
     src_image_2 = encoded_filtering[index]
     return [src_image_1, src_image_2]

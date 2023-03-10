@@ -58,11 +58,11 @@ def apply_filter(img:np.ndarray, is_high_pass:bool, filter_type:str, filter_para
 
     # Apply the filter to the spectrum
     filtered_spectrum = np.multiply(fshift, filter)
-    fft_mag_log = np.log(abs(filtered_spectrum+1))
+    fft_magnitud_spectrum = np.log(abs(filtered_spectrum+1))
     # Compute the inverse Fourier transform to obtain the filtered image
     filtered_img = apply_ifft(filtered_spectrum)
     
-    return filtered_img,fft_mag_log 
+    return filtered_img,fft_magnitud_spectrum 
 
     
 def apply_low_pass(img:np.ndarray, filter_type:str, filter_params:dict):

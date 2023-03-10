@@ -1,7 +1,5 @@
 import numpy as np
 
-
-
 def meshgrid(rows,cols):
     """
     Create a mesh grid of coordinates centered around the center.
