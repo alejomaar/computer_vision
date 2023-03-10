@@ -1,65 +1,35 @@
-Image Frequency Filters
-This is a Python library that provides an implementation of frequency filters for image processing, specifically, low-pass and high-pass filters. These filters can be applied to images to remove or enhance certain frequency components.
+# 
 
-Installation
-To install the library, run the following command:
+.
 
-Copy code
-pip install image-frequency-filters
+### Getting Started
+
+#### Installation
+
+
+
 Usage
-The library provides two main functions for applying frequency filters to images: apply_low_pass_filter and apply_high_pass_filter.
 
-Low-pass filter
-To apply a low-pass filter to an image, use the apply_low_pass_filter function. This function takes the following arguments:
 
-img: The input image as a NumPy array.
-filter_type: The type of low-pass filter to apply. The possible values are "ideal", "gaussian", and "butterworth".
-filter_params: A dictionary with the parameters for the selected filter type.
-Here's an example of how to use the apply_low_pass_filter function:
 
-python
-Copy code
-import cv2
-from image_frequency_filters import apply_low_pass_filter
+### Examples
 
-# Load the image
-img = cv2.imread("image.jpg", cv2.IMREAD_GRAYSCALE)
+Original Image
+alt text
 
-# Define the filter parameters
-filter_params = {"D": 20}
+Low Pass Filter
+alt text
 
-# Apply the low-pass filter
-filtered_img = apply_low_pass_filter(img, "gaussian", filter_params)
+High Pass Filter
+alt text
 
-# Show the filtered image
-cv2.imshow("Filtered Image", filtered_img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-High-pass filter
-To apply a high-pass filter to an image, use the apply_high_pass_filter function. This function takes the same arguments as apply_low_pass_filter.
+### License
 
-Here's an example of how to use the apply_high_pass_filter function:
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-python
-Copy code
-import cv2
-from image_frequency_filters import apply_high_pass_filter
+Acknowledgments
 
-# Load the image
-img = cv2.imread("image.jpg", cv2.IMREAD_GRAYSCALE)
-
-# Define the filter parameters
-filter_params = {"D": 20}
-
-# Apply the high-pass filter
-filtered_img = apply_high_pass_filter(img, "gaussian", filter_params)
-
-# Show the filtered image
-cv2.imshow("Filtered Image", filtered_img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-Contributing
-Contributions are welcome! If you want to contribute, please submit a pull request with your changes.
-
-License
-This library is licensed under the MIT License. See the LICENSE file for more information.
+- OpenCV documentation
+- NumPy documentation
+- Dash documentation
+- Matplotlib documentation
