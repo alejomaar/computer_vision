@@ -11,31 +11,36 @@ from preprocessing.filter import apply_low_pass
 from preprocessing.fft import apply_fft
 from constants import IDEAL_FILTER,GAUSSIAN_FILTER,BUTTERWORTH_FILTER
 
-# Load image
+# Define constants
 IMG_FILE = 'img/city.png'
-img = cv2.imread(IMG_FILE, 0)
+FILTER_TYPE = BUTTERWORTH_FILTER
+CUTOFF_FREQUENCIES = list(range(10, 100, 5))
+ANIMATION_INTERVAL = 200
 
-# Define filter type and filter cuttof ranges
-filter_type = BUTTERWORTH_FILTER
-cuttof_frecuencies = list(range(10,100,5))
+def load_image(file_path: str) -> np.ndarray:
+    """Load an image from a file."""
+    img = cv2.imread(file_path, 0)
+    if img is None:
+        raise ValueError(f"Failed to load image from file: {file_path}")
+    return img
 
-#Animation rate
-refresh_rate = 200
-
-def original_fft_magnitude(img):
+def full_log_magnitude(img):
     fshift = apply_fft(img)
-    fft_mag_log = np.log(abs(fshift+1))
-    normalize = normalize_uint8(fft_mag_log)
+    fft_mag_log = 20*np.log(abs(fshift+1))
+    normalize = normalize_img(fft_mag_log)
     return image_to_base64(normalize)
 
-def normalize_uint8(img):
+def normalize_img(img):
+    """Normalize the pixel values of an image to the range [0, 255]."""
     return cv2.normalize(img, None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
 
 def image_to_base64(img):
     image_utf8 =  base64.b64encode(cv2.imencode('.png', img)[1]).decode('utf-8')
     return 'data:image/png;base64,{}'.format(image_utf8)
 
-def draw_circle(img,radius):
+def fft_magnitude_details(img,radius):
+    """Add details to an FFT magnitude image, such as a cuttof frecuency radius and text annotations."""
+    img = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
     rows,cols,_ = img.shape
     center_y = int(rows/2)
     center_x = int(cols/2)
@@ -48,26 +53,30 @@ def draw_circle(img,radius):
     return image
 
 def encode_images(images):
+    """Encode a list of images in base64 format."""
     return [image_to_base64(img) for img in images]
 
 
 def apply_gaussian_filter(img, cuttof_frecuencies):
+    """Applies the specified frequency filter to the input image for each cutoff frequency and returns the filtered images and spectra."""
     filtered_images = []
     filtered_spectra = []
     for cutoff_frequency in cuttof_frecuencies:
+        #Define and apply frequency filter
         filter_params = {"cutoff_frequency": cutoff_frequency,'degree':10}
-        filtered_image, filtered_spectrum = apply_low_pass(img, filter_type, filter_params)
-        filtered_spectrum = normalize_uint8(filtered_spectrum)
-        filtered_spectrum = cv2.cvtColor(filtered_spectrum,cv2.COLOR_GRAY2RGB)
-        filtered_spectrum = draw_circle(filtered_spectrum,cutoff_frequency)
-        filtered_images.append(normalize_uint8(filtered_image))
-        filtered_spectra.append(filtered_spectrum)
+        filtered_image, filtered_spectrum = apply_low_pass(img, FILTER_TYPE, filter_params)
+        #Normalize image in utf8 image format [0,255]
+        filtered_image = normalize_img(filtered_image)
+        filtered_spectrum = normalize_img(filtered_spectrum)
+        #Add some intersting details to frequency plot.
+        filtered_spectrum_with_details = fft_magnitude_details(filtered_spectrum,cutoff_frequency)
+        filtered_images.append(filtered_image)
+        filtered_spectra.append(filtered_spectrum_with_details)
     return filtered_images, filtered_spectra
 
-
+img  = load_image(IMG_FILE)
 # Apply low-pass frequency filter
-filter_imgs, filter_spectrums = apply_gaussian_filter(img, cuttof_frecuencies)
-
+filter_imgs, filter_spectrums = apply_gaussian_filter(img, CUTOFF_FREQUENCIES)
 # Encode filter images in base 64
 encoded_imgs = encode_images(filter_imgs)
 encoded_filtering = encode_images(filter_spectrums)
@@ -79,7 +88,7 @@ app = dash.Dash(
 )
 
 app.layout = dbc.Container([
-    html.H1('Frecuency filters'),
+    html.H1('Frequency filters'),
     dbc.Row(
         [
             dbc.Col([
@@ -92,7 +101,7 @@ app.layout = dbc.Container([
             ], width=2),
             dcc.Interval(
                 id='interval-component',
-                interval=refresh_rate, 
+                interval=ANIMATION_INTERVAL, 
                 n_intervals=0
             )
         ],
@@ -101,7 +110,7 @@ app.layout = dbc.Container([
         [
             dbc.Col([
                 html.H2('FFT in the original image'),
-                html.Img(id='function', src= original_fft_magnitude(img)),
+                html.Img(id='function', src= full_log_magnitude(img)),
             ], width=2),
             dbc.Col([
                 html.H2('FFT low pass filter image'),
@@ -115,7 +124,7 @@ app.layout = dbc.Container([
 
 @app.callback(Output('filter_image', 'src'), Output('fft_filter', 'src'), [Input('interval-component', 'n_intervals')])
 def update_image(n):
-    index = n%len(cuttof_frecuencies)
+    index = n%len(CUTOFF_FREQUENCIES)
     src_image_1 = encoded_imgs[index]
     src_image_2 = encoded_filtering[index]
     return [src_image_1, src_image_2]
