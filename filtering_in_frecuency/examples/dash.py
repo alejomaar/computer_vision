@@ -32,9 +32,14 @@ def encode_images(images):
 
 
 def apply_gaussian_filter(img, scales):
-    results = [apply_low_pass(img, filter_type, {"cutoff_frequency": cutoff_frequency}) for cutoff_frequency in scales]
-    filter_imgs, filter_spectrums = zip(*results)
-    return  filter_imgs, filter_spectrums
+    filtered_images = []
+    filtered_spectra = []
+    for cutoff_frequency in scales:
+        filtered_image, filtered_spectrum = apply_low_pass(img, filter_type, {"cutoff_frequency": cutoff_frequency})
+        filtered_images.append(normalize_uint8(filtered_image))
+        filtered_spectra.append(normalize_uint8(filtered_spectrum))
+
+    return filtered_images, filtered_spectra
 
 
 # Apply low-pass frequency filter
@@ -55,7 +60,7 @@ app = dash.Dash(
 
 # Define el layout de la aplicación de Dash
 app.layout = dbc.Container([
-    html.H1('Filtros en frecuencia'),
+    html.H1('Frecuency filters'),
     dbc.Row(
         [
             dbc.Col([
