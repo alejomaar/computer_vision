@@ -9,40 +9,40 @@ from filter.filter import apply_low_pass
 import matplotlib.pyplot as plt
 import io
 
+# Load image
+img = cv2.imread('img3.png',0)
+
+# Define filter type and filter cuttof ranges
+filter_type = "ideal"
+cuttof_frecuency_range = list(range(10,100,5))
+
+#Animation rate
+refresh_rate = 200
+
+
 def normalize_uint8(img):
     return cv2.normalize(img, None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
 
-
-refresh_rate = 200
-# Carga la imagen
-img = cv2.imread('img3.png',0)
-#img =  cv2.resize(img,None, fx = 0.5, fy = 0.5)
-
-# Escalas de filtro gaussiano
-scales = list(range(10,100,5))
-
-def apply_gaussian_filter(img, scales):
-    filter_type = "ideal"
-    def filtering(img,cutoff_frequency):        
-        filter_params = {"cutoff_frequency": cutoff_frequency}
-        filtered_img, filtered_spectrum = apply_low_pass(img, filter_type, filter_params)
-        return normalize_uint8(filtered_img)
-    def filtering_spectrum(img,cutoff_frequency):        
-        filter_params = {"cutoff_frequency": cutoff_frequency}
-        filtered_img, filtered_spectrum = apply_low_pass(img, filter_type, filter_params)
-        return normalize_uint8(filtered_spectrum)
-
-    return {'filtered_img': [filtering(img,scale) for scale in scales],
-            'filtered_spectrum': [filtering_spectrum(img,scale) for scale in scales] }
+def image_to_base64(img):
+    image_utf8 =  base64.b64encode(cv2.imencode('.png', img)[1]).decode('utf-8')
+    return 'data:image/png;base64,{}'.format(image_utf8)
 
 def encode_images(images):
-    return [base64.b64encode(cv2.imencode('.png', img)[1]).decode('utf-8') for img in images]
+    return [image_to_base64(img) for img in images]
 
 
-# Aplica el filtro gaussiano y crea los objetos de gráfico de plotly
-output = apply_gaussian_filter(img, scales)
-encoded_imgs = encode_images(output['filtered_img'])
-encoded_filtering = encode_images(output['filtered_spectrum'])
+def apply_gaussian_filter(img, scales):
+    results = [apply_low_pass(img, filter_type, {"cutoff_frequency": cutoff_frequency}) for cutoff_frequency in scales]
+    filter_imgs, filter_spectrums = zip(*results)
+    return  filter_imgs, filter_spectrums
+
+
+# Apply low-pass frequency filter
+filter_imgs, filter_spectrums = apply_gaussian_filter(img, cuttof_frecuency_range)
+
+# Encode filter images in base 64
+encoded_imgs = encode_images(filter_imgs)
+encoded_filtering = encode_images(filter_spectrums)
 
 
 # Crea la aplicación de Dash
@@ -59,12 +59,12 @@ app.layout = dbc.Container([
     dbc.Row(
         [
             dbc.Col([
-                html.H2('Input'),
-                html.Img(id='image1', src='data:image/png;base64,{}'.format(img)),
+                html.H2('Input Image'),
+                html.Img(id='image1', src=image_to_base64(img)),
             ], width=2),
             dbc.Col([
                 html.H2('Filter image'),
-                html.Img(id='filter_image', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+                html.Img(id='filter_image', src=encoded_imgs[0]),
             ], width=2),
             dcc.Interval(
                 id='interval-component',
@@ -77,11 +77,11 @@ app.layout = dbc.Container([
         [
             dbc.Col([
                 html.H2('FFT Filter'),
-                html.Img(id='fft_filter', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+                html.Img(id='fft_filter', src=encoded_filtering[0]),
             ], width=2),
             dbc.Col([
                 html.H2('Filter function'),
-                html.Img(id='function', src='data:image/png;base64,{}'.format(encoded_imgs[0])),
+                html.Img(id='function', src= encoded_filtering[-1]),
             ], width=2)
         ])
     ],
@@ -91,9 +91,9 @@ app.layout = dbc.Container([
 
 @app.callback(Output('image1', 'src'), Output('fft_filter', 'src'), [Input('interval-component', 'n_intervals')])
 def update_image(n):
-    index = n%len(scales)
-    src_image_1 = 'data:image/png;base64,{}'.format(encoded_imgs[index])
-    src_image_2 = 'data:image/png;base64,{}'.format(encoded_filtering[index])
+    index = n%len(cuttof_frecuency_range)
+    src_image_1 = encoded_imgs[index]
+    src_image_2 = encoded_filtering[index]
     return [src_image_1, src_image_2]
 
 # Ejecuta la aplicación de Dash
