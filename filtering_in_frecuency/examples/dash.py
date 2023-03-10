@@ -16,7 +16,7 @@ IMG_FILE = 'img/city.png'
 img = cv2.imread(IMG_FILE, 0)
 
 # Define filter type and filter cuttof ranges
-filter_type = IDEAL_FILTER
+filter_type = BUTTERWORTH_FILTER
 cuttof_frecuencies = list(range(10,100,5))
 
 #Animation rate
@@ -35,6 +35,18 @@ def image_to_base64(img):
     image_utf8 =  base64.b64encode(cv2.imencode('.png', img)[1]).decode('utf-8')
     return 'data:image/png;base64,{}'.format(image_utf8)
 
+def draw_circle(img,radius):
+    rows,cols,_ = img.shape
+    center_y = int(rows/2)
+    center_x = int(cols/2)
+    center_coordinates = (center_x, center_y)
+    
+    color = (255, 0, 255)
+    thickness = 2
+    image = cv2.circle(img, center_coordinates, radius, color, thickness)
+    cv2.putText(image, f'cuttof frecuency:{radius}', (center_x-80, center_y-radius-20), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+    return image
+
 def encode_images(images):
     return [image_to_base64(img) for img in images]
 
@@ -43,10 +55,13 @@ def apply_gaussian_filter(img, cuttof_frecuencies):
     filtered_images = []
     filtered_spectra = []
     for cutoff_frequency in cuttof_frecuencies:
-        filter_params = {"cutoff_frequency": cutoff_frequency}
+        filter_params = {"cutoff_frequency": cutoff_frequency,'degree':10}
         filtered_image, filtered_spectrum = apply_low_pass(img, filter_type, filter_params)
+        filtered_spectrum = normalize_uint8(filtered_spectrum)
+        filtered_spectrum = cv2.cvtColor(filtered_spectrum,cv2.COLOR_GRAY2RGB)
+        filtered_spectrum = draw_circle(filtered_spectrum,cutoff_frequency)
         filtered_images.append(normalize_uint8(filtered_image))
-        filtered_spectra.append(normalize_uint8(filtered_spectrum))
+        filtered_spectra.append(filtered_spectrum)
     return filtered_images, filtered_spectra
 
 

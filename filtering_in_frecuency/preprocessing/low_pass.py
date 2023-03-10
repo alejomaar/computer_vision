@@ -16,7 +16,7 @@ class LowPass():
         distance_square =  xv**2 + yv**2      
         return np.exp(-(distance_square)/(2*cutoff_frequency**2))
     
-    def butterworth(self,cutoff_frequency:int,degree:int):
+    def butterworth(self,cutoff_frequency:int,degree:int=4):
         xv,yv =meshgrid(self.rows,self.cols)
         distance =  np.sqrt(xv**2 + yv**2)        
         return 1/(1+(distance/cutoff_frequency)**(2*degree))
