@@ -1,9 +1,9 @@
 import numpy as np
+import cv2
+from constants import IDEAL_FILTER,GAUSSIAN_FILTER,BUTTERWORTH_FILTER
 from .fft import apply_fft,apply_ifft
 from .low_pass import LowPass
 from .high_pass import HighPass
-import cv2
-
 
 
 def get_filter(img:np.ndarray, is_high_pass:bool, filter_type:str, **kwargs):
@@ -25,11 +25,11 @@ def get_filter(img:np.ndarray, is_high_pass:bool, filter_type:str, **kwargs):
     else:
         filter = LowPass(rows, cols)
 
-    if filter_type == "ideal":
+    if filter_type == IDEAL_FILTER:
         low_pass_filter = filter.ideal(**kwargs)
-    elif filter_type == "gaussiano":
+    elif filter_type == GAUSSIAN_FILTER:
         low_pass_filter = filter.gaussian(**kwargs)
-    elif filter_type == "butterworth":
+    elif filter_type == BUTTERWORTH_FILTER:
         low_pass_filter = filter.butterworth(**kwargs)
     else:
         raise ValueError("No valid filter type")

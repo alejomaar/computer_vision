@@ -9,13 +9,14 @@ import numpy as np
 
 from preprocessing.filter import apply_low_pass
 from preprocessing.fft import apply_fft
+from constants import IDEAL_FILTER,GAUSSIAN_FILTER,BUTTERWORTH_FILTER
 
 # Load image
 IMG_FILE = 'img/city.png'
 img = cv2.imread(IMG_FILE, 0)
 
 # Define filter type and filter cuttof ranges
-filter_type = "ideal"
+filter_type = IDEAL_FILTER
 cuttof_frecuencies = list(range(10,100,5))
 
 #Animation rate
