@@ -25,6 +25,7 @@ def load_image(file_path: str) -> np.ndarray:
     return img
 
 def full_log_magnitude(img):
+    """Return the log spectrum magnitude for a given image"""
     fshift = apply_fft(img)
     fft_mag_log = 20*np.log(abs(fshift+1))
     normalize = normalize_img(fft_mag_log)
@@ -70,6 +71,7 @@ def apply_gaussian_filter(img, cuttof_frecuencies):
         filtered_spectrum = normalize_img(filtered_spectrum)
         #Add some intersting details to frequency plot.
         filtered_spectrum_with_details = fft_magnitude_details(filtered_spectrum,cutoff_frequency)
+        #Append filtered images to list
         filtered_images.append(filtered_image)
         filtered_spectra.append(filtered_spectrum_with_details)
     return filtered_images, filtered_spectra
