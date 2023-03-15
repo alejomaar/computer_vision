@@ -15,6 +15,13 @@ h1 {
   color: white;
 }
 
+h5 {
+  font-size: 0.7rem !important;
+  margin: 0 auto;
+  color: white;
+  font-weight: 300;
+}
+
 h2 {
   font-size: 0.8rem !important;
   color: white;
@@ -29,6 +36,13 @@ html {
   height: 100%;
   margin: 0;
   background-color: #1e1e26;
+}
+
+.header_title{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin:  0 auto;
 }
 
 .container {

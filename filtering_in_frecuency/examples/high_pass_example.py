@@ -3,10 +3,11 @@ from visualization import show_images
 from preprocessing.filter import apply_high_pass
 from constants import IDEAL_FILTER,GAUSSIAN_FILTER,BUTTERWORTH_FILTER
 
-'''
-Apply LOW PASS IDEAL FILTER to an image with a cutoff frequency of 30 and show the results
-NOTE: Change the `filter_type` to IDEAL_FILTER, GAUSSIAN_FILTER or BUTTERWORTH_FILTER to check other filters
-'''
+"""This Python code reads an image, converts it to grayscale, and applies a high pass filter on it.
+The high pass filter can be of three types: IDEAL_FILTER,GAUSSIAN_FILTER,BUTTERWORTH_FILTER.
+You can increase the cutoff frequency, the higher it is, the sharper the image will be with much more defined edges.
+The filtered image and its spectrum are then displayed using the visualization function 'show_images'
+"""
 
 if __name__ == '__main__':
     # Read image   

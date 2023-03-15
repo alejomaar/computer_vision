@@ -11,6 +11,9 @@ from preprocessing.filter import apply_low_pass
 from preprocessing.fft import apply_fft
 from constants import IDEAL_FILTER,GAUSSIAN_FILTER,BUTTERWORTH_FILTER
 
+"""Show an animated dashboard about the impact of different cutoff frequencies on an image.
+"""
+
 # Define constants
 IMG_FILE = 'img/city.png'
 FILTER_TYPE = BUTTERWORTH_FILTER
@@ -24,23 +27,24 @@ def load_image(file_path: str) -> np.ndarray:
         raise ValueError(f"Failed to load image from file: {file_path}")
     return img
 
-def full_log_magnitude(img):
+def full_img_magnitud(img:np.ndarray)->np.ndarray:
     """Return the log spectrum magnitude for a given image"""
     fshift = apply_fft(img)
     fft_mag_log = 20*np.log(abs(fshift+1))
     normalize = normalize_img(fft_mag_log)
-    return image_to_base64(normalize)
+    return normalize
 
-def normalize_img(img):
+def normalize_img(img:np.ndarray)->np.ndarray:
     """Normalize the pixel values of an image to the range [0, 255]."""
     return cv2.normalize(img, None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
 
-def image_to_base64(img):
+def image_to_base64(img:np.ndarray)->str:
+    """Encode an image in base64 format."""
     image_utf8 =  base64.b64encode(cv2.imencode('.png', img)[1]).decode('utf-8')
     return 'data:image/png;base64,{}'.format(image_utf8)
 
-def fft_magnitude_details(img,radius):
-    """Add details to an FFT magnitude image, such as a cuttof frecuency radius and text annotations."""
+def fft_magnitude_details(img:np.ndarray,radius:float)->np.ndarray:
+    """Add details to an FFT magnitude image, such as a cuttof frequency radius and text annotations."""
     img = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
     rows,cols,_ = img.shape
     center_y = int(rows/2)
@@ -50,39 +54,42 @@ def fft_magnitude_details(img,radius):
     color = (255, 0, 255)
     thickness = 2
     image = cv2.circle(img, center_coordinates, radius, color, thickness)
-    cv2.putText(image, f'cuttof frecuency:{radius}', (center_x-80, center_y-radius-20), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+    cv2.putText(image, f'cuttof frequency:{radius}', (center_x-80, center_y-radius-20), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
     return image
 
-def encode_images(images):
+def encode_images(images:list[np.ndarray])->list[str]:
     """Encode a list of images in base64 format."""
     return [image_to_base64(img) for img in images]
 
 
-def apply_gaussian_filter(img, cuttof_frecuencies):
-    """Applies the specified frequency filter to the input image for each cutoff frequency and returns the filtered images and spectra."""
-    filtered_images = []
-    filtered_spectra = []
-    for cutoff_frequency in cuttof_frecuencies:
-        #Define and apply frequency filter
-        filter_params = {"cutoff_frequency": cutoff_frequency,'degree':10}
-        filtered_image, filtered_spectrum = apply_low_pass(img, FILTER_TYPE, filter_params)
-        #Normalize image in utf8 image format [0,255]
-        filtered_image = normalize_img(filtered_image)
-        filtered_spectrum = normalize_img(filtered_spectrum)
-        #Add some intersting details to frequency plot.
-        filtered_spectrum_with_details = fft_magnitude_details(filtered_spectrum,cutoff_frequency)
-        #Append filtered images to list
-        filtered_images.append(filtered_image)
-        filtered_spectra.append(filtered_spectrum_with_details)
-    return filtered_images, filtered_spectra
+def apply_filter(img:np.ndarray, cutoff_frequency:float) -> tuple[np.ndarray, np.ndarray]:
+    """Applies the specified frequency filter to the input image for a given cutoff frequency and returns the filtered image and spectrum."""
+    filter_params = {"cutoff_frequency": cutoff_frequency, "degree": 10}
+    filtered_image, filtered_spectrum = apply_low_pass(img, FILTER_TYPE, filter_params)
+    # Normalize images in utf8 image format [0, 255]
+    filtered_image = normalize_img(filtered_image)
+    filtered_spectrum = normalize_img(filtered_spectrum)
+    # Add some interesting details to the frequency plot
+    filtered_log_magnitude_with_details = fft_magnitude_details(filtered_spectrum, cutoff_frequency)
+    return filtered_image, filtered_log_magnitude_with_details
+
+def get_filter_collection(img:np.ndarray, cuttof_frequencies:list[float])-> tuple[list, list]:
+    """Applies the multiple cuttof frequencies to a image, and return a list of filtered images and filtered magnitudes"""
+    filter_images = []
+    filtered_magnitudes = []
+    for cutoff_frequency in cuttof_frequencies:
+        filtered_image, filtered_magnitud = apply_filter(img,cutoff_frequency)
+        filter_images.append(filtered_image)
+        filtered_magnitudes.append(filtered_magnitud)
+    return filter_images, filtered_magnitudes
 
 img  = load_image(IMG_FILE)
 # Apply low-pass frequency filter
-filter_imgs, filter_spectrums = apply_gaussian_filter(img, CUTOFF_FREQUENCIES)
-# Encode filter images in base 64
+filter_imgs, filter_spectrums = get_filter_collection(img, CUTOFF_FREQUENCIES)
+# Encode filter images in base64
 encoded_imgs = encode_images(filter_imgs)
 encoded_filtering = encode_images(filter_spectrums)
-
+log_magnitude_spectrum= full_img_magnitud(img)
 
 # Create Dash application
 app = dash.Dash(
@@ -90,7 +97,10 @@ app = dash.Dash(
 )
 
 app.layout = dbc.Container([
-    html.H1('Frequency filters'),
+    html.Div([
+        html.H1('Image filtering in Frequency Domain '),
+        html.H5('Butterworth Filter, Degree 10'),
+    ],className='header_title'),    
     dbc.Row(
         [
             dbc.Col([
@@ -112,7 +122,7 @@ app.layout = dbc.Container([
         [
             dbc.Col([
                 html.H2('FFT in the original image'),
-                html.Img(id='function', src= full_log_magnitude(img)),
+                html.Img(id='function', src= image_to_base64(log_magnitude_spectrum)),
             ], width=2),
             dbc.Col([
                 html.H2('FFT low pass filter image'),
