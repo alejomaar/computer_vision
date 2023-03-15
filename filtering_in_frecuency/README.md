@@ -7,7 +7,10 @@
     <br> 
 </p>
 
-<img align="center" src="img/dashboard.gif">
+<p align="center">
+  <img src="img/dashboard.gif" alt="Animated image Frequency Filter"/>
+</p>
+
 
 ## 📝 Table of Contents
 - [Getting Started](#getting_started)
