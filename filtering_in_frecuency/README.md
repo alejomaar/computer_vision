@@ -7,7 +7,7 @@
     <br> 
 </p>
 
-![Image filtering animation](img/dashboard.gif)
+<img align="center" src="img/dashboard.gif">
 
 ## 📝 Table of Contents
 - [Getting Started](#getting_started)
