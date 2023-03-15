@@ -1,10 +1,13 @@
 <h3 align="center">Image Frequency Filters</h3>
 
+
 ---
 
-<p align="center"> This project provides a demonstration of how to use low and high pass filters for image frequency filtering. The code uses NumPy, OpenCV, Dash, and Matplotlib libraries in Python language
+<p align="center"> This project provides a demonstration of how to use high and low pass filters for image filtering in frequency. The main idea of this project is to identify the differences of applying different filters and to understand how changing the frequency domain affects the spatial domain.
     <br> 
 </p>
+
+![Image filtering animation](img/dashboard.gif)
 
 ## 📝 Table of Contents
 - [Getting Started](#getting_started)
@@ -18,8 +21,7 @@
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
-These instructions will get you a copy of the project up and running on your local machine for development
-and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.
+These instructions will provide you with a working copy of the project on your local machine. There are 2 examples of applying frequency filters showing the original image and the filtered image (The classic way). There is an additional example that shows frequency filtering in animated form (`in dashboard.py file`), this is great if you want to understand how different cutoff frequency values affect the filtered image.
 
 ### Installing <a name="installing"></a>
 

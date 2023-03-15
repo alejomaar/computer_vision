@@ -66,6 +66,7 @@ def apply_filter(img:np.ndarray, cutoff_frequency:float) -> tuple[np.ndarray, np
     """Applies the specified frequency filter to the input image for a given cutoff frequency and returns the filtered image and spectrum."""
     filter_params = {"cutoff_frequency": cutoff_frequency, "degree": 10}
     filtered_image, filtered_spectrum = apply_low_pass(img, FILTER_TYPE, filter_params)
+    filtered_spectrum[filtered_spectrum<1] = 0
     # Normalize images in utf8 image format [0, 255]
     filtered_image = normalize_img(filtered_image)
     filtered_spectrum = normalize_img(filtered_spectrum)
