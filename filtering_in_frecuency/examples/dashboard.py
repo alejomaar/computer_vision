@@ -15,7 +15,7 @@ from constants import IDEAL_FILTER,GAUSSIAN_FILTER,BUTTERWORTH_FILTER
 """
 
 # Define constants
-IMG_FILE = 'img/city.png'
+IMG_FILE = 'img/lenna.png'
 FILTER_TYPE = BUTTERWORTH_FILTER
 CUTOFF_FREQUENCIES = list(range(10, 100, 5))
 ANIMATION_INTERVAL = 200
@@ -64,7 +64,7 @@ def encode_images(images:list[np.ndarray])->list[str]:
 
 def apply_filter(img:np.ndarray, cutoff_frequency:float) -> tuple[np.ndarray, np.ndarray]:
     """Applies the specified frequency filter to the input image for a given cutoff frequency and returns the filtered image and spectrum."""
-    filter_params = {"cutoff_frequency": cutoff_frequency, "degree": 10}
+    filter_params = {"cutoff_frequency": cutoff_frequency, "degree": 5}
     filtered_image, filtered_spectrum = apply_low_pass(img, FILTER_TYPE, filter_params)
     filtered_spectrum[filtered_spectrum<1] = 0
     # Normalize images in utf8 image format [0, 255]
@@ -100,7 +100,7 @@ app = dash.Dash(
 app.layout = dbc.Container([
     html.Div([
         html.H1('Image filtering in Frequency Domain '),
-        html.H5('Butterworth Filter, Degree 10'),
+        html.H5('Butterworth Filter, Degree 5'),
     ],className='header_title'),    
     dbc.Row(
         [

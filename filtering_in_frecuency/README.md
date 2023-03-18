@@ -24,15 +24,20 @@
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
-These instructions will provide you with a working copy of the project on your local machine. There are 2 examples of applying frequency filters showing the original image and the filtered image (The classic way). There is an additional example that shows frequency filtering in animated form (`in dashboard.py file`), this is great if you want to understand how different cutoff frequency values affect the filtered image.
+These instructions will provide you with a working copy of the project on your local machine. There are 2 examples of applying frequency filters showing the original image and the filtered image (The classic way). There is an additional example that shows frequency filtering in animated form (`dashboard.py`), this is great if you want to understand how different cutoff frequency values affect the filtered image.
 
 ### Installing <a name="installing"></a>
 
 1. Clone the repository.
    git clone https://github.com/your_username/your_project.git
 
-2. Install the required libraries.
-   pip install -r requirements.txt
+2. Move to the project directory
+   cd filtering_in_frecuency
+
+3. Install the packages (Using Pipenv)
+   `pipenv install`
+   or (Using Other Virtual Environment in python 3.11) 
+   `pip install -r requirements.txt`
 
 ## 🎈 Usage <a name="usage"></a>
 
