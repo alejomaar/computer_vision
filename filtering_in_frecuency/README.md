@@ -29,7 +29,7 @@ These instructions will provide you with a working copy of the project on your l
 ### Installing <a name="installing"></a>
 
 1. Clone the repository.
-   `git clone https://github.com/your_username/your_project.git`
+   `git clone https://github.com/alejomaar/computer_vision.git
 
 2. Move to the project directory
    `cd filtering_in_frecuency`
@@ -69,12 +69,12 @@ python -m examples.high_pass_example
 
 - Example 3
 
-Check the filtering animation of multiple cuttof thresolds in a dynamic manner in Dash.
+Visualize how to change a frequency filter with different values in a dashboard
 
-1. Run the dash.py script
+1. Run the dashboard.py script
 
 ```
-python -m examples.dash
+python -m examples.dashboard
 ```
 
 2. Open a web browser and navigate to http://localhost:8050/.
