@@ -29,14 +29,15 @@ These instructions will provide you with a working copy of the project on your l
 ### Installing <a name="installing"></a>
 
 1. Clone the repository.
-   git clone https://github.com/your_username/your_project.git
+   `git clone https://github.com/your_username/your_project.git`
 
 2. Move to the project directory
-   cd filtering_in_frecuency
+   `cd filtering_in_frecuency`
 
-3. Install the packages (Using Pipenv)
+3. Install the virtual environment.
    `pipenv install`
-   or (Using Other Virtual Environment in python 3.11) 
+
+* `Note` If you use other dependency manager as (conda,virtualenv) install the packages in the `requirements.txt` file in python 3.11
    `pip install -r requirements.txt`
 
 ## 🎈 Usage <a name="usage"></a>
@@ -51,6 +52,8 @@ Apply low pass filter to image
 python -m examples.low_pass_example
 ```
 
+![image info](img/low_pass.jpg)
+
 - Example 2
 
 Apply high pass filter to image
@@ -60,6 +63,9 @@ Apply high pass filter to image
 ```
 python -m examples.high_pass_example
 ```
+
+
+![image info](img/high_pass.jpg)
 
 - Example 3
 
